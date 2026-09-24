@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16.4
+    container_name: golfstockmarket-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: golfstockmarket
+      POSTGRES_PASSWORD: localdev
+      POSTGRES_DB: golfstockmarket
+    ports:
+      # bound to localhost only — not reachable from the LAN
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U golfstockmarket"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: golfstockmarket-redis
+    restart: unless-stopped
+    ports:
+      # bound to localhost only — not reachable from the LAN
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  redisdata:
